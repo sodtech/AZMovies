@@ -1,0 +1,129 @@
+﻿@model IEnumerable<A2ZMOVIES.Models.Movies>
+
+@{
+    ViewBag.Title = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div style="margin: 20px">
+
+    <a class="btn btn-primary btn-large" href="/Movies/ToCreateUpdate/0">Add New Movie</a>
+
+</div>
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" >
+              <h5 id="id1">loading</h5>
+                <h5 id="id2">loading</h5>
+                <h5 id="id3">loading</h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<table class="table table-bordered table-hover"  id="movie-table">
+    <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Genre</th>
+            <th>Details</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @*@foreach (var movie in Model)
+        {
+            <tr>
+                <td>@Html.ActionLink(movie.Name, "ToCreateUpdate", "Movies", new { id = movie.Id }, null)</td>
+                <td>@movie.MovieGenreType.GenreName</td>
+            </tr>
+        }*@
+    </tbody>
+</table>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+           var table =  $("#movie-table").DataTable(
+                {
+                    ajax: {
+                        url: "/api/moviess/",
+                        dataSrc: "",
+                    },
+                    columns: [
+                        {
+                            data: "name",
+                            render: function (data, type, movie) {
+                                return "<a href='/Movies/ToCreateUpdate/" + movie.id + "'> " + movie.name + " </a>";
+                            }
+                        },
+                        {
+                            data: "movieGenreType.genreName",
+                        },
+                        {
+                            data:"id",
+                            render: function (data) {
+                                return "<a id='get-id' data-movie-id = " + data + " class='btn-links js-details' data-toggle='modal' data-target='#exampleModalCenter'> Details </a>"
+                            }
+                        },
+                        {
+                            data: "id",
+                            render: function (data) {
+
+                                return "<button  class='btn-link id js-delete' data-movie-id = " + data + "> Delete </button>"
+                            }
+                        }
+                    ]
+                });
+
+           $("#movie-table").on("click", ".js-delete", function () {
+               var button = $(this);
+               bootbox.confirm("Are you sure you want to delete", function (result) {
+                   if (result) {
+                       $.ajax(
+                           {
+                               url: "api/moviess/" + button.attr("data-movie-id"),
+                               method: "DELETE",
+                               success: function () {
+                                   table.row(button.parents("tr")).remove().draw();
+                               }
+                          });
+                   };
+               });
+           });
+
+           $("#movie-table").on("click", "#get-id", function () {
+               var button = $(this);
+               $.ajax({
+                        url: "api/moviess/" + button.attr("data-movie-id"),
+                        method: "GET",
+                        success: function (movie) {
+                            let date1 = new Date(movie.dateAdded)
+                            
+                           
+                            document.getElementById("id1").innerHTML = "Movie Name:  " + movie.name;
+                            document.getElementById("id2").innerHTML = "Date Added:  " + date1.toLocaleString();
+                            document.getElementById("id3").innerHTML = "Movie Remaining:  " + movie.numberInStock;
+                            movieDetails = {};
+                              }
+                          });
+           });
+
+        });
+
+
+    </script>
+}           

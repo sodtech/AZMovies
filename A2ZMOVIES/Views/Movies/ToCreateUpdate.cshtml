@@ -1,0 +1,63 @@
+﻿
+@model A2ZMOVIES.viewMovieModel.MovieView
+
+@{
+    ViewBag.Title = "ToCreateUpdate";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="margin: 20px; ">
+    @{
+        if (@Model.Id == 0)
+        {
+            <p class="btn btn-primary btn-large">Add New Movie</p><br /> <br />
+
+        }
+        else
+        {
+            <p class="btn btn-primary btn-large">Edit Movie</p><br /> <br />
+
+        }
+
+    }
+
+</div>
+
+@Html.ValidationSummary()
+
+@using (Html.BeginForm("SaveUpdateMovie", "Movies"))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.Name)
+        @Html.TextBoxFor(m => m.Name, new { Class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ReleaseDAte)
+        @Html.TextBoxFor(m => m.ReleaseDAte, "{0:d MMMM yyyy}", new { Class = "form-control" })
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.NumberInStock)
+        @Html.TextBoxFor(m => m.NumberInStock, new { Class = "form-control" })
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MovieGenreTypeId)
+        @Html.DropDownListFor(m => m.MovieGenreTypeId, new SelectList(Model.MovieGenres, "Id", "GenreName"), "Select Movie Genre", new { Class = "form-control" })
+    </div>
+
+    @Html.HiddenFor(m => m.DateAdded , new { Value = DateTime.Now })
+
+    @Html.HiddenFor(m => m.Id)
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn  btn-success"> Save </button>
+
+}
+
+@section Scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

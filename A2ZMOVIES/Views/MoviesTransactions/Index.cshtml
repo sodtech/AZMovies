@@ -1,0 +1,63 @@
+﻿@model IEnumerable< A2ZMOVIES.Models.NewRentals>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Movies Transactions</h2>
+
+<table class="table table-bordered table-hover" id="movie-table">
+    <thead>
+        <tr>
+            <th>customer Name</th>
+            <th>Movie Rented</th>
+            <th>Date Rented</th>
+        </tr>
+    </thead>
+    <tbody>
+    @*@foreach (var movi_tran in Model)
+    {
+       <tr>
+            <td>@movi_tran.Customer.Name</td>
+            <td>@movi_tran.Movie.Name</td>
+            <td>@movi_tran.DateRented</td>
+        </tr> 
+    }*@
+    </tbody>
+</table>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var table = $("#movie-table").DataTable(
+                 {
+                     ajax: {
+                         url: "/api/Newrental/",
+                         dataSrc: "",
+                     },
+                     columns: [
+                         {
+                             data: "customer.name",
+                            
+                         },
+                         {
+                             data: "movie.name",
+                         },
+                         {
+                             data: "dateRented",
+                             render: function (data) {
+                                 let dt = new Date(data)
+                                 return dt.toLocaleString()
+                             }
+
+                         }
+                     ]
+                 });
+        });
+
+
+    </script>
+}           

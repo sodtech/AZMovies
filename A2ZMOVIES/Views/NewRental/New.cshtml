@@ -1,0 +1,174 @@
+﻿
+@{
+    ViewBag.Title = "New Rental Form";
+}
+
+<h2>New Rental Form</h2>
+
+<form id="newRental">
+    <div class=" form-group">
+        <label>select customer</label>
+        <select required class="form-control" id="customer">
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>select movie</label>
+        <select required  class="form-control" id="movi"></select>
+    </div>
+    <div class="row" >
+        <div class="col-md-3">
+            <ul id="movies" class=" list-group"></ul>
+        </div>
+    </div>
+    <button id ="submit-form" class="btn btn-primary">Submit</button>
+    <input type="button" class="btn btn-danger reset-form " value=" reset">
+</form>
+
+@section Scripts
+{
+    @Scripts.Render("~/Scripts/jquery.validate.js");
+    <script>
+        $(document).ready(function () {
+            var movie_select = [];
+            var vm = {
+                CustomerId: "",
+                MoviesIds: []
+            };
+            $(window).load(function () {
+                $.ajax({
+                    url: "/api/customers",
+                    type: "get",
+                    success: function (customer) {
+                        for (var i = 0 ; i < customer.length ; i++)
+                        { var opt = new Option(customer[i].name);
+                            opt.value = customer[i].id
+                            $("#customer").append(opt);
+                            $("#customer").val(""); }
+                    }
+                })
+            })  
+            $("#customer").change(function () {
+                var customer_id = $(this).children("option:selected").val();
+                vm.CustomerId = customer_id;
+            });
+   
+            $(window).load(function () {
+
+                $.ajax({
+                    url: "/api/moviess",
+                    type: "get",
+                    success: function (movie) {
+                        for (var i = 0; i < movie.length; i++) {
+
+                            var opt = new Option(movie[i].name);
+                            opt.value = movie[i].id;
+                            $("#movi").append(opt);
+                            $("#movi").val("");
+                        }
+                    }
+                });
+                
+                $("#movi").change(function () {
+                    var selected_movie = $(this).children("option:selected").text();
+                    var selected_id = $(this).children("option:selected").val();
+                    if (movie_select.includes(selected_movie))
+                    {
+                        alert("movie exist in the list")
+                    }
+                    else {
+                        $("#movies").append("<ol  class='list-group-item  ' id = 'list'>" + selected_movie + "</ol>")
+                        movie_select.push(selected_movie);
+                        vm.MoviesIds.push(selected_id);
+                    }})});
+
+            //jQuery.validator.addMethod("atLeastOneMovie", function () {
+            //    return vm.MoviesIds.lenght > 0;
+            //}, "Please select one movie");
+
+           $("#newRental").on("click", ".reset-form", function () {
+               resetForm()
+           })
+           var validation = $("#newRental").validate({
+               
+                submitHandler: function () {
+                    $.ajax({
+                        url: "/api/NewRental",
+                        method: "post",
+                        data: vm
+                    })
+                        .done(function () {
+                        toastr.success("Rental Successfully Recorded")
+                        resetForm();
+                        validation.resetForm();})
+                    .fail(function () {
+                        toastr.error("Rental Failed") });
+                    return false;
+                }
+           });
+
+           function resetForm() {
+               $("#customer").val("");
+               $("#movi").val("");
+               $("#movies").empty();
+               movie_select = []
+               vm = {
+                   CustomerId: "",
+                   MoviesIds: []
+               };
+           }
+        });
+    </script>
+
+}
+
+@*//var customer = new Bloodhound({
+            //    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+            //    queryTokenizer: Bloodhound.tokenizers.whitespace,
+            //    remote: {
+            //        url: '/api/customers?query=%QUERY',
+            //         wildcard: '%QUERY'
+            //    }
+            //});
+
+
+            //$('#customer').typeahead({
+            //    minlenght: 3,
+            //    highlight: true
+
+            //}, {
+            //    name: 'customers',
+            //    display: 'name',
+            //    source: customer
+            //}).on("typeahaed:select", function (e, customer) {
+            //    vm.customerId = customer.id;
+            //});
+
+
+
+
+            //var movies = new Bloodhound({
+            //    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+            //    queryTokenizer: Bloodhound.tokenizers.whitespace,
+            //    remote: {
+            //        url: '/api/moviess?query=%QUERY',
+            //        wildcard: '%QUERY'
+            //    }
+            //});
+
+
+            //$('#movie').typeahead({
+            //    minlenght: 3,
+            //    highlight: true
+
+            //}, {
+            //    name: 'movies',
+            //    display:'name',
+            //    source: movies
+            //}).on("typeahead:select", function (e, movie) {
+
+            //    //$("#movies").append("<li>" + movie.name + "</li>")
+
+            //    //$("#movie").typeahead("val", "");
+
+            //    //vm.moviesId.push(movies.id);*@

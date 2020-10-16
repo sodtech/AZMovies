@@ -1,0 +1,48 @@
+﻿@model IEnumerable<A2ZMOVIES.Models.Movies>
+
+@{
+    ViewBag.Title = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Movies</h2>
+
+
+<table class="table table-bordered table-hover"  id="movie-table">
+    <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Genre</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+           var table =  $("#movie-table").DataTable(
+                {
+                    ajax: {
+                        url: "/api/moviess/",
+                        dataSrc: "",
+                    },
+                    columns: [
+                        {
+                            data: "name",
+                            
+                        },
+                        {
+                            data: "movieGenreType.genreName",
+
+                        },
+                      
+                    ]
+                });
+
+        });
+
+    </script>
+}           
